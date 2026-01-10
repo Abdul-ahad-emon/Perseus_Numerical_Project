@@ -117,4 +117,28 @@ void compareWithSimpson(double a, double b, double exact)
          << fabs(S - exact) << endl;
 }
 
+/* =====================================================
+   8. Sarhan Saad
+   Task: Error decay & convergence data generation
+===================================================== */
+void generateErrorFiles(const vector<vector<double>> &R,
+                        double a, double b, double exact)
+{
+    ofstream romErr("error_romberg.csv");
+    ofstream simpErr("error_simpson.csv");
+
+    romErr << "level,error\n";
+    simpErr << "n,error\n";
+
+    for (int k = 1; k <= 5; k++)
+        romErr << k << "," << fabs(R[k][k] - exact) << "\n";
+
+    for (int n = 2; n <= 128; n *= 2)
+        simpErr << n << "," << fabs(simpson(a, b, n) - exact) << "\n";
+
+    romErr.close();
+    simpErr.close();
+}
+
+
 
