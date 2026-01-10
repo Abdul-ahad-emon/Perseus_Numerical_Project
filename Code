@@ -50,3 +50,25 @@ double simpson(double a, double b, int n)
     }
     return sum * h / 3.0;
 }
+/* =====================================================
+   4. MD. Jamiur Rahman Khan
+   Task: Romberg Integration – table construction logic
+===================================================== */
+vector<vector<double>> romberg(double a, double b, int maxLevel)
+{
+    vector<vector<double>> R(maxLevel, vector<double>(maxLevel));
+
+    for (int k = 0; k < maxLevel; k++)
+    {
+        int n = static_cast<int>(pow(2, k));
+        R[k][0] = trapezoidal(a, b, n);
+
+        for (int j = 1; j <= k; j++)
+        {
+            R[k][j] = R[k][j - 1] +
+                      (R[k][j - 1] - R[k - 1][j - 1]) /
+                      (pow(4, j) - 1);
+        }
+    }
+    return R;
+}
