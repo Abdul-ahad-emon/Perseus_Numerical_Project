@@ -102,3 +102,19 @@ void printRombergTable(const vector<vector<double>>& R)
         cout << endl;
     }
 }
+
+/* =====================================================
+   7. Md. Mezbahuzzaman Rana	
+   Task: Simpson vs Romberg comparison logic
+===================================================== */
+void compareWithSimpson(double a, double b, double exact)
+{
+    int nSimpson = 4;
+    double S = simpson(a, b, nSimpson);
+
+    cout << "\nSimpson's Rule (n=4) = " << S << endl;
+    cout << "Simpson Absolute Error = "
+         << fabs(S - exact) << endl;
+}
+
+
