@@ -1,6 +1,6 @@
 <div align="center">
 
-# Numerical Methods – CSE261.2
+# Numerical Methods – CSE261.2  
 # Group Assignment
 
 </div>
@@ -9,28 +9,54 @@
 
 <div align="center">
 
-# Romberg Integration
+# Romberg Integration 
 
 </div>
 
 ---
 
-## Assignment Description
+## 📘 Assignment Description
+
+This project is part of the **CSE261: Numerical Methods** course assignment.  
+The objective of this assignment is to:
+
+- Implement **Romberg Integration** using recursive Richardson extrapolation.
+- Compare the results with **Simpson’s 1/3 Rule** and the **Composite Trapezoidal Rule**.
+- Analyze **accuracy, convergence behavior, and error decay**.
+- Demonstrate **convergence acceleration** using Romberg’s method.
+- Visualize the **error decay comparison** using plots.
+
+The test problem used in this assignment is:
+
+I = ∫₀¹ sin(x) dx = 1 − cos(1)
+
+
+All implementations are done in **C++**, and the report is prepared using **LaTeX**.
+
+---
+
+## 🎯 Project Objectives
+
+- Construct a **full Romberg table** using recursive formulas.
+- Compute numerical approximations using:
+  - Composite Trapezoidal Rule
+  - Simpson’s 1/3 Rule
+  - Romberg Integration
+- Compare all results with the **exact analytical solution**.
+- Generate **error decay data** and visualize convergence behavior.
+- Organize the project using **GitHub** for version control and collaboration.
 
 ---
 
 <div align="center">
 
-# Group Name  - (Perseus)
-
+## 👥 Group Name — Perseus
 
 </div>
 
-
-
 <div align="center">
 
-## Group Members and Student IDs
+## 👨‍🎓 Group Members and Student IDs
 
 </div>
 
@@ -53,8 +79,35 @@
 
 ---
 
-## Project Contents
+<div align="center">
+
+## 📄 Project Files & Resources
+
+</div>
 
 ---
 
-<div align="center">
+### 📘 Full LaTeX Report (Source File In Overleaf)
+
+> 🔗 **Click here to view or download the LaTeX source file:**  
+> **[Romberg_Integration_Report_Perseus.tex](https://www.overleaf.com/read/tkfmmrfqtjgf#c7972f)**
+
+---
+
+### 📦 Additional Files Included in This Repository
+
+- 📄 **C++ Source Code**
+  - Implementation of Trapezoidal, Romberg Integration, and Simpson’s 1/3 Rule
+- 📄 **Pseudocode**
+  - Pseudocode of Composite Trapezoidal Rule, Simpson, and Romberg methods
+- 📊 **Figures & Plots**
+  - Error decay comparison plot (Romberg vs Simpson)
+- 📑 **Output Tables & CSV Files**
+  - `error_romberg.csv`
+  - `error_simpson.csv`
+- 📄 **Final Compiled PDF Report**
+- 🧾 **README.md** (this file)
+
+---
+
+
