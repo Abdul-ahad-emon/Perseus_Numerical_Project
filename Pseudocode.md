@@ -26,8 +26,27 @@ Algorithm Composite_Trapezoidal(a, b, n)
 ```
 
 ---
+## 2. Romberg Integration
 
-## 2. Simpson’s 1/3 Rule
+Algorithm Romberg(a, b, maxLevel)
+
+```
+1. Create 2D array R[maxLevel][maxLevel]
+
+2. For k = 0 to maxLevel - 1
+       n ← 2^k
+       R[k][0] ← Composite_Trapezoidal(a, b, n)
+
+3.     For j = 1 to k
+           R[k][j] ← R[k][j - 1]
+                      + ( R[k][j - 1] - R[k - 1][j - 1] ) / ( 4^j - 1 )
+       End For
+   End For
+
+4. Return R
+
+```
+## 3. Simpson’s 1/3 Rule
 
 Algorithm Simpson(a, b, n)
 
@@ -52,23 +71,4 @@ Algorithm Simpson(a, b, n)
 
 ---
 
-## 3. Romberg Integration
 
-Algorithm Romberg(a, b, maxLevel)
-
-```
-1. Create 2D array R[maxLevel][maxLevel]
-
-2. For k = 0 to maxLevel - 1
-       n ← 2^k
-       R[k][0] ← Composite_Trapezoidal(a, b, n)
-
-3.     For j = 1 to k
-           R[k][j] ← R[k][j - 1]
-                      + ( R[k][j - 1] - R[k - 1][j - 1] ) / ( 4^j - 1 )
-       End For
-   End For
-
-4. Return R
-
-```
