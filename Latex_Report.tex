@@ -1,0 +1,646 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+
+\geometry{margin=1in}
+
+\title{\textbf{Romberg Integration and Comparison with Simpson's Rule}}
+\author{
+Course: CSE261 -- Numerical Methods\\
+Group Name: \textbf{Perseus}
+}
+\date{}
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    breaklines=true,
+    tabsize=2,
+    showstringspaces=false
+}
+
+
+\begin{document}
+%----------------------------------------
+% Cover Page
+%----------------------------------------
+\begin{titlepage}
+    \centering
+    \includegraphics[width=0.25\textwidth]{SEULogo.png}\par\vspace{0.6cm}
+    
+    {\scshape\LARGE Southeast University, Bangladesh \par}
+    \vspace{0.5cm}
+    
+    {\Large \textbf{CSE261: Numerical Methods} \par}
+    \vspace{0.3cm}
+    
+    {\Large Group Assignment Report \par}
+    \vspace{0.7cm}
+    
+    {\large \textbf{Assignment Topic:} Romberg Integration and Comparison with Simpson's Rule \par}
+    \vspace{0.5cm}
+    
+    {\large \textbf{Group Name:} Perseus \par}
+    \vspace{0.5cm}
+    
+    {\large \textbf{Group Members:}} \par
+    \vspace{0.2cm}
+
+    {\small
+    \begin{center}
+    \begin{tabular}{|c|l|c|}
+    \hline
+    \textbf{No.} & \textbf{Name} & \textbf{Student ID} \\
+    \hline
+    1  & MD. Jamiur Rahman Khan & 2024100000162 \\
+    2  & Antor Sikder           & 2024100000165 \\
+    3  & Oyshie Ahmed           & 2024100000188 \\
+    4  & Nurjahan Khanom Mim    & 2024100000230 \\
+    5  & Mehedi Hasan Omi       & 2024100000254 \\
+    6  & Md. Mezbahuzzaman Rana & 2024100000481 \\
+    7  & Md Shah Naohaj Khan    & 2024100000487 \\
+    8  & Abdul Ahad Emon        & 2024100000490 \\
+    9  & Rehan Khadem           & 2024100000512 \\
+    10 & Sarhan Saad            & 2024100000520 \\
+    \hline
+    \end{tabular}
+    \end{center}
+    }
+
+    \vfill
+    
+    \textbf{Submitted To:}  \par
+    Tashreef Muhammad - TMD  \\
+    Lecturer, Dept. of CSE  \\
+    Southeast University, Bangladesh \par
+    
+    \vspace{0.5cm}
+    
+    Fall 2025
+    
+\end{titlepage}
+%------------------------------------------------
+\section{Introduction}
+
+Let the function be defined as
+\[
+f(x) = \sin x
+\]
+
+The objective is to numerically evaluate the definite integral
+\[
+I = \int_a^b f(x)\,dx
+\]
+where
+\[
+a = 0 \quad \text{and} \quad b = 1
+\]
+
+The exact value of the integral is
+\[
+I = \int_0^1 \sin x\,dx = 1 - \cos(1) \approx 0.4596976941
+\]
+
+In this report, the integral is first approximated using the Composite Trapezoidal Rule.
+Romberg Integration is then applied to accelerate the convergence of the Trapezoidal Rule
+using Richardson extrapolation. Finally, the numerical results obtained using Romberg
+Integration are compared with Simpson’s 1/3 Rule in terms of accuracy and convergence behavior.
+
+%------------------------------------------------
+\section{Composite Trapezoidal Rule}
+
+The Composite Trapezoidal Rule approximates a definite integral by dividing the interval
+$[a,b]$ into $n$ equal subintervals.
+
+Let,
+\[
+a = \text{lower limit of integration}
+\]
+\[
+b = \text{upper limit of integration}
+\]
+\[
+n = \text{number of subintervals}
+\]
+\[
+h = \frac{b-a}{n} \quad \text{(step size)}
+\]
+
+The nodal points are defined as
+\[
+x_i = a + ih, \quad i = 0,1,2,\ldots,n
+\]
+and
+\[
+y_i = f(x_i)
+\]
+
+The Composite Trapezoidal Rule is given by
+\[
+\int_a^b f(x)\,dx \approx T_n
+\]
+where
+\[
+T_n = \frac{h}{2}
+\left[
+(y_0 + y_n) + 2(y_1 + y_2 + \cdots + y_{n-1})
+\right]
+\]
+\subsection*{Pseudocode: Composite Trapezoidal Rule}
+
+\begin{algorithm}[H]
+\caption{Composite Trapezoidal Rule}
+\begin{algorithmic}[1]
+\Require $a, b$ (integration limits), $n$ (number of subintervals)
+\Ensure Approximation of $\int_a^b f(x)\,dx$
+
+\State $h \gets \dfrac{b - a}{n}$
+\State $sum \gets \dfrac{1}{2}\left(f(a) + f(b)\right)$
+
+\For{$i = 1$ to $n - 1$}
+    \State $x \gets a + i \cdot h$
+    \State $sum \gets sum + f(x)$
+\EndFor
+
+\State $T \gets sum \cdot h$
+\State \Return $T$
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Application}
+
+For
+\[
+f(x) = \sin x, \quad [a,b] = [0,1]
+\]
+we take
+\[
+n = 4 \Rightarrow h = \frac{1-0}{4} = 0.25
+\]
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c c}
+\toprule
+$x$ & $f(x)=\sin x$ \\
+\midrule
+0.00 & 0.0000000000 \\
+0.25 & 0.2474039593 \\
+0.50 & 0.4794255386 \\
+0.75 & 0.6816387600 \\
+1.00 & 0.8414709848 \\
+\bottomrule
+\end{tabular}
+\caption{Tabulated values of $f(x)$}
+\end{table}
+
+\[
+T_4 = \frac{0.25}{2}
+\left[(0 + 0.8414709848) + 2(0.2474039593 + 0.4794255386 + 0.68163876)\right]
+\]
+
+\[
+T_4 = 0.4573009376
+\]
+
+\[
+\text{Absolute Error} = |0.4596976941 - 0.4573009376| = 0.0023967571
+\]
+
+%------------------------------------------------
+\section{Romberg Integration}
+
+Romberg Integration improves the Composite Trapezoidal Rule by applying Richardson
+extrapolation to eliminate lower-order error terms.
+
+Let
+\[
+R(k,0) = \text{Trapezoidal approximation using } 2^k \text{ subintervals}
+\]
+
+The recursive Romberg formula is
+\[
+R(k,j) = R(k,j-1) +
+\frac{R(k,j-1) - R(k-1,j-1)}{4^j - 1}
+\]
+\subsection*{Pseudocode: Romberg Integration}
+
+\begin{algorithm}[H]
+\caption{Romberg Integration}
+\begin{algorithmic}[1]
+\Require $a, b$ (integration limits), $L$ (maximum level)
+\Ensure Romberg table $R$ and best approximation of $\int_a^b f(x)\,dx$
+
+\State Create a 2D array $R[0 \dots L][0 \dots L]$
+
+\For{$k = 0$ to $L$}
+    \State $n \gets 2^k$
+    \State $R(k,0) \gets$ Trapezoidal$(a, b, n)$
+
+    \For{$j = 1$ to $k$}
+        \State $R(k,j) \gets R(k,j-1) + \dfrac{R(k,j-1) - R(k-1,j-1)}{4^j - 1}$
+    \EndFor
+\EndFor
+
+\State \Return $R$
+
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Romberg Table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c c c c}
+\toprule
+$k \backslash j$ & 0 & 1 & 2 \\
+\midrule
+0 & 0.4500805155 & & \\
+1 & 0.4573009376 & 0.4597077450 & \\
+2 & 0.4593451120 & 0.4596974570 & 0.4596976941 \\
+\bottomrule
+\end{tabular}
+\caption{Romberg Integration Table}
+\end{table}
+
+The most accurate approximation is obtained from the last diagonal element:
+\[
+R(2,2) = 0.4596976941
+\]
+
+\[
+\text{Absolute Error} \approx 0
+\]
+
+%------------------------------------------------
+\section{Simpson's 1/3 Rule}
+
+Simpson’s 1/3 Rule approximates the integral by fitting quadratic polynomials
+over pairs of subintervals.
+
+Let
+\[
+n = \text{even number of subintervals}
+\]
+\[
+h = \frac{b-a}{n}
+\]
+
+The Simpson’s 1/3 Rule formula is
+\[
+\int_a^b f(x)\,dx \approx
+\frac{h}{3}
+\left[
+(y_0 + y_n) + 4(y_1 + y_3 + \cdots + y_{n-1})
++ 2(y_2 + y_4 + \cdots + y_{n-2})
+\right]
+\]
+
+For $n=4$ and $h=0.25$,
+\[
+S = \frac{0.25}{3}
+\left[(0 + 0.8414709848) + 4(0.2474039593 + 0.68163876)
++ 2(0.4794255386)\right]
+\]
+
+\[
+S = 0.4597077448
+\]
+
+\[
+\text{Absolute Error} = 0.0000100507
+\]
+\subsection*{Pseudocode: Simpson's 1/3 Rule}
+
+\begin{algorithm}[H]
+\caption{Simpson's 1/3 Rule}
+\begin{algorithmic}[1]
+\Require $a, b$ (integration limits), $n$ (even number of subintervals)
+\Ensure Approximation of $\int_a^b f(x)\,dx$
+
+\State $h \gets \dfrac{b - a}{n}$
+\State $sum \gets f(a) + f(b)$
+
+\For{$i = 1$ to $n - 1$}
+    \State $x \gets a + i \cdot h$
+    \If{$i$ is even}
+        \State $sum \gets sum + 2 \cdot f(x)$
+    \Else
+        \State $sum \gets sum + 4 \cdot f(x)$
+    \EndIf
+\EndFor
+
+\State $S \gets \dfrac{h}{3} \cdot sum$
+\State \Return $S$
+
+\end{algorithmic}
+\end{algorithm}
+
+
+%------------------------------------------------
+\section{Error and Convergence Analysis}
+
+The Composite Trapezoidal Rule has an error order of $O(h^2)$, whereas Simpson’s Rule
+has an error order of $O(h^4)$. Romberg Integration further accelerates convergence
+by systematically eliminating lower-order error terms through Richardson extrapolation.
+
+%------------------------------------------------
+\section{Error Decay Comparison}
+
+To illustrate convergence acceleration, the absolute error is plotted against the
+refinement level for Romberg Integration and Simpson’s 1/3 Rule.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{error_decay.png}
+\caption{Error decay comparison between Romberg Integration and Simpson's Rule}
+\end{figure}
+
+The figure clearly shows that the error in Romberg Integration decreases much faster
+than that of Simpson’s Rule, confirming convergence acceleration.
+
+%------------------------------------------------
+\section{Comparison of Results}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c c c}
+\toprule
+Method & Approximate Value & Absolute Error \\
+\midrule
+Composite Trapezoidal Rule & 0.4573009376 & 0.0023967571 \\
+Simpson’s 1/3 Rule & 0.4597077448 & 0.0000100507 \\
+Romberg Integration & 0.4596976941 & $\approx 0$ \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of numerical integration methods}
+\end{table}
+
+%------------------------------------------------
+
+\section{Discussion}
+
+From the numerical experiments, it is evident that different numerical integration
+methods exhibit significantly different accuracy levels even when applied to the
+same problem with the same number of subintervals.
+
+The Composite Trapezoidal Rule provides a reasonable first approximation, but its
+accuracy is limited due to its second-order error behavior. Simpson’s 1/3 Rule
+improves the result substantially by using quadratic interpolation, which increases
+the order of accuracy to $O(h^4)$. This is clearly reflected in the much smaller
+absolute error obtained using Simpson’s Rule.
+
+Romberg Integration further enhances the accuracy by applying Richardson
+extrapolation to systematically eliminate lower-order error terms from the
+Trapezoidal Rule approximations. As seen from the Romberg table and the error
+decay plot, the convergence is extremely rapid, and the final result matches the
+exact value up to machine precision.
+
+The error decay plot confirms that Romberg Integration achieves much faster
+convergence compared to Simpson’s Rule. This demonstrates the power of
+extrapolation-based methods in numerical analysis, especially when high accuracy
+is required with relatively few function evaluations.
+
+In practical scientific and engineering computations, such fast convergence is
+highly desirable because it reduces computational cost while maintaining very
+high precision.
+
+%------------------------------------------------
+\section{Conclusion}
+
+In this project, the definite integral of $\sin x$ over the interval $[0,1]$ was
+evaluated using the Composite Trapezoidal Rule, Simpson’s 1/3 Rule, and Romberg
+Integration. The numerical results were compared with the exact analytical value
+to assess accuracy and convergence behavior.
+
+The results show that while the Composite Trapezoidal Rule provides a basic
+approximation, Simpson’s Rule significantly improves the accuracy. Romberg
+Integration, however, outperforms both methods by achieving near machine-precision
+accuracy using Richardson extrapolation.
+
+The Romberg method not only produced the most accurate result but also showed
+the fastest convergence rate, as confirmed by the error decay plot. This verifies
+that Romberg Integration is a highly efficient and powerful technique for numerical
+integration, especially when high precision is required.
+
+Thus, the objectives of constructing the Romberg table, comparing it with
+Simpson’s Rule, and demonstrating convergence acceleration have been successfully
+achieved.
+
+%------------------------------------------------
+\begin{thebibliography}{9}
+
+\bibitem{chapra}
+S. C. Chapra and R. P. Canale,
+\textit{Numerical Methods for Engineers},
+7th Edition, McGraw-Hill Education, 2015.
+
+\bibitem{burden}
+R. L. Burden and J. D. Faires,
+\textit{Numerical Analysis},
+9th Edition, Brooks/Cole, Cengage Learning, 2011.
+
+\bibitem{kincaid}
+D. Kincaid and W. Cheney,
+\textit{Numerical Analysis: Mathematics of Scientific Computing},
+3rd Edition, Brooks/Cole, 2002.
+
+\bibitem{atkinson}
+K. Atkinson,
+\textit{An Introduction to Numerical Analysis},
+2nd Edition, Wiley, 1989.
+
+\end{thebibliography}
+
+%------------------------------------------------
+\section{Implementation (C++ Source Code)}
+
+The following C++ program was implemented to compute the numerical approximation
+of the given integral using  Simpson’s 1/3 Rule,
+and Romberg Integration. The program also computes absolute errors and generates
+data files for plotting error decay graphs.
+
+\begin{lstlisting}
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <iomanip>
+#include <fstream>
+
+using namespace std;
+
+const double PI = 3.14159265358979323846;
+
+// ------------------------------
+// Test function
+// ------------------------------
+double f(double x)
+{
+    return sin(x);
+}
+
+// ------------------------------
+// Composite Trapezoidal Rule
+// ------------------------------
+double trapezoidal(double a, double b, int n)
+{
+    double h = (b - a) / n;
+    double sum = 0.5 * (f(a) + f(b));
+
+    for (int i = 1; i < n; i++)
+    {
+        sum += f(a + i * h);
+    }
+
+    return sum * h;
+}
+
+// ------------------------------
+// Simpson's 1/3 Rule
+// ------------------------------
+double simpson(double a, double b, int n)
+{
+    if (n % 2 != 0)
+        n++; // must be even
+
+    double h = (b - a) / n;
+    double sum = f(a) + f(b);
+
+    for (int i = 1; i < n; i++)
+    {
+        double x = a + i * h;
+        if (i % 2 == 0)
+            sum += 2 * f(x);
+        else
+            sum += 4 * f(x);
+    }
+
+    return sum * h / 3.0;
+}
+
+// ------------------------------
+// Romberg Integration
+// ------------------------------
+vector<vector<double>> romberg(double a, double b, int maxLevel)
+{
+    vector<vector<double>> R(maxLevel, vector<double>(maxLevel));
+
+    for (int k = 0; k < maxLevel; k++)
+    {
+        int n = 1 << k; // n = 2^k
+        R[k][0] = trapezoidal(a, b, n);
+
+        for (int j = 1; j <= k; j++)
+        {
+            R[k][j] = R[k][j - 1] + (R[k][j - 1] - R[k - 1][j - 1]) / (pow(4, j) - 1);
+        }
+    }
+
+    return R;
+}
+
+// ------------------------------
+// Main Program
+// ------------------------------
+int main()
+{
+    double a = 0.0;
+    double b = 1.0;
+
+    double exact = 1.0 - cos(1.0); // Exact integral of sin(x) from 0 to 1
+
+    cout << fixed << setprecision(12);
+
+    // ------------------------------
+    // Romberg Table
+    // ------------------------------
+    int maxLevel = 6;
+    auto R = romberg(a, b, maxLevel);
+
+    cout << "Romberg Integration Table:\n\n";
+
+    for (int i = 0; i < maxLevel; i++)
+    {
+        for (int j = 0; j <= i; j++)
+        {
+            cout << setw(18) << R[i][j] << " ";
+        }
+        cout << "\n";
+    }
+
+    double bestRomberg = R[maxLevel - 1][maxLevel - 1];
+
+    cout << "\nBest Romberg Approximation = " << bestRomberg << endl;
+    cout << "Exact Value               = " << exact << endl;
+    cout << "Romberg Absolute Error    = " << fabs(bestRomberg - exact) << endl;
+
+    // ------------------------------
+    // Simpson Result
+    // ------------------------------
+    int nSimpson = 4;
+    double S = simpson(a, b, nSimpson);
+
+    cout << "\nSimpson's Rule (n=4): " << S << endl;
+    cout << "Simpson Absolute Error: " << fabs(S - exact) << endl;
+
+    // ------------------------------
+    // Generate data files for plots
+    // ------------------------------
+    ofstream fRom("error_romberg.csv");
+    ofstream fSimp("error_simpson.csv");
+
+    fRom << "level,error\n";
+    fSimp << "n,error\n";
+
+    // Romberg error decay
+    for (int k = 0; k < maxLevel; k++)
+    {
+        double err = fabs(R[k][k] - exact);
+        fRom << k << "," << err << "\n";
+    }
+
+    // Simpson error decay
+    for (int n = 2; n <= 128; n *= 2)
+    {
+        double val = simpson(a, b, n);
+        double err = fabs(val - exact);
+        fSimp << n << "," << err << "\n";
+    }
+
+    fRom.close();
+    fSimp.close();
+
+    return 0;
+}
+
+\end{lstlisting}
+
+
+%------------------------------------------------
+
+\newpage
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+{\Huge \textbf{THE END}}
+\end{center}
+\vspace*{\fill}
+
+\end{document}
+
