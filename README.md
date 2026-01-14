@@ -53,7 +53,7 @@ The main objectives of this project are:
 
 <div align="center">
 
-## 👥 Group Name — Perseus
+# 👥 Group Name — Perseus
 
 </div>
 
@@ -108,8 +108,10 @@ The main objectives of this project are:
 - 📑 **Output Tables & CSV Files**
   - `error_romberg.csv`
   - `error_simpson.csv`
+- 📄 **Final Compiled Latex File**
 - 📄 **Final Compiled PDF Report**
-- 🧾 **README.md** (this file)
+- 🧾 **README.md**
+- 🧾 **All File Combined Zip File**
 
 ---
 
